@@ -29,6 +29,7 @@ Cập nhật: 04/11/2026. Workspace máy tính: `~/vmx_ws`; workspace VMX: `~/st
 - `studica-ros2.service` chạy liên tục khoảng 1 phút 19 giây. Node C++ trên ASUS nhận pin 11,71–11,81 V và IMU `imu_link`; client C++ trên VMX trả pitch -1,46°, yaw -0,07°, roll -1,49°. Đã dừng và thử lại start/stop; kết quả cuối `Result=success`, UDP `active`, `manual_composition` đã dừng.
 - Sau lần reboot đầu bị kẹt trước khi SSH chạy, người dùng cấp nguồn lại và SSH hoạt động. Nhật ký của boot lỗi kết thúc khi `snapd.apparmor.service` vừa bắt đầu; dịch vụ này nằm trước `sysinit.target` và trước SSH trong chuỗi khởi động. Đã cài drop-in giới hạn `TimeoutStartSec=45s`, kiểm tra `systemctl restart snapd.apparmor.service` trả `Result=success`.
 - Một lần reboot phần mềm tiếp theo đưa SSH trở lại sau khoảng 25 giây. Ban đầu NTP chưa đồng bộ; khoảng một phút sau, timesyncd nhận `172.22.11.1`. `scripts/verify_board_after_reboot.sh` chạy lại thành công: UDP `active/enabled`, ROS 2 `inactive/disabled`, NTP `yes`, offset `-524 µs`, root distance `31,134 ms`.
+- Đã khởi tạo Git cho workspace và đẩy 31 file nguồn/tài liệu lên repository riêng tư `phuctran-arch/vmx_ws`, nhánh `main`. Đã đối chiếu SHA commit đầu tiên `7b07692` giữa máy và GitHub. Các thư mục build, log và thư viện nhị phân `vendor/opt/` không nằm trong commit.
 
 ## File đã tạo hoặc chỉnh sửa
 
@@ -56,3 +57,4 @@ Không còn đầu việc bắt buộc của bảy giai đoạn. Có thể tiế
 1. Sau các lần reboot hoặc cấp nguồn sau này, chạy `~/vmx_ws/scripts/verify_board_after_reboot.sh` trên ASUS. Script tự chờ NTP tối đa hai phút trước khi kết luận.
 2. Nếu VMX lại trả lời ping nhưng SSH từ chối, dùng màn hình/bàn phím để xem `systemctl status snapd.apparmor.service ssh --no-pager` và `journalctl -b -u snapd.apparmor.service -u ssh --no-pager` trước khi cấp nguồn lại.
 3. Kiểm tra sau reboot ASUS khi có thể: Chrony tự chạy và Ethernet vẫn có `172.22.11.1/24`.
+4. Với các thay đổi sau này trong `~/vmx_ws`, tạo commit và chạy `git push origin main` để đồng bộ repository GitHub.
