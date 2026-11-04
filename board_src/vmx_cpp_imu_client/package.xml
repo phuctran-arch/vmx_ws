@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>vmx_cpp_imu_client</name>
+  <version>0.1.0</version>
+  <description>Read-only C++ client for the Studica VMX IMU service.</description>
+  <maintainer email="maintainer@example.com">VMX workspace maintainer</maintainer>
+  <license>Apache-2.0</license>
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <depend>rclcpp</depend>
+  <depend>studica_control</depend>
+  <export><build_type>ament_cmake</build_type></export>
+</package>

@@ -1,0 +1,17 @@
+[Unit]
+Description=Studica ROS 2 VMX sensor driver (switches from UDP mode)
+After=network-online.target systemd-timesyncd.service
+Wants=network-online.target
+
+[Service]
+Type=exec
+User=root
+Group=root
+ExecStartPre=/bin/bash -c '[[ $(timedatectl show -p NTPSynchronized --value) == yes ]]'
+ExecStart=/usr/local/sbin/run_studica_ros2_mode.sh
+Restart=no
+KillMode=mixed
+TimeoutStopSec=25
+
+[Install]
+WantedBy=multi-user.target

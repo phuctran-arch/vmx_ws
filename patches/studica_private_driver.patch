@@ -1,0 +1,43 @@
+diff --git a/src/studica_control/CMakeLists.txt b/src/studica_control/CMakeLists.txt
+index 922ce1b..ee2a1ff 100644
+--- a/src/studica_control/CMakeLists.txt
++++ b/src/studica_control/CMakeLists.txt
+@@ -1,6 +1,10 @@
+ cmake_minimum_required(VERSION 3.8)
+ project(studica_control)
+ 
++# Keep this checkout's C++ driver private to the Studica ROS 2 workspace.
++# The VMX also runs a legacy service linked against the system driver.
++get_filename_component(STUDICA_DRIVER_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../drivers" REALPATH)
++
+ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+   add_compile_options(-Wall -Wextra -Wpedantic)
+ endif()
+@@ -35,7 +39,7 @@ rosidl_get_typesupport_target(cpp_typesupport_target "${PROJECT_NAME}" "rosidl_t
+ include_directories( # <- #include <"">
+   include 
+   /usr/local/include/vmxpi 
+-  /usr/local/include/studica_drivers
++  ${STUDICA_DRIVER_DIR}
+   ${CMAKE_CURRENT_BINARY_DIR}/rosidl_generator_cpp
+ )
+  
+@@ -175,15 +179,14 @@ target_link_libraries(manual_composition
+   colore_component
+   parsec_component
+   /usr/local/lib/vmxpi/libvmxpi_hal_cpp.so
+-  /usr/local/lib/studica_drivers/libstudica_drivers.so
++  ${STUDICA_DRIVER_DIR}/libstudica_drivers.so
+ )
+ ament_target_dependencies(manual_composition ${dependencies})
+ target_link_libraries(manual_composition "${cpp_typesupport_target}")
+ # $ORIGIN/.. resolves to install/studica_control/lib/ at runtime, where the
+-# component .so files live. The vmxpi and studica_drivers paths are for the
+-# hardware driver libs installed system-wide.
++# component .so files live. Keep the new Studica driver in this checkout.
+ set_target_properties(manual_composition PROPERTIES
+-  INSTALL_RPATH "$ORIGIN/..;/usr/local/lib/vmxpi;/usr/local/lib/studica_drivers"
++  INSTALL_RPATH "$ORIGIN/..;/usr/local/lib/vmxpi;${STUDICA_DRIVER_DIR}"
+ )
+ 
+ install(TARGETS
