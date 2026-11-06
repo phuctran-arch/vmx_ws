@@ -47,13 +47,13 @@ Cập nhật: 06/11/2026. Workspace máy tính: `~/vmx_ws`; workspace VMX: `~/st
 
 Không còn đầu việc bắt buộc của bảy giai đoạn. Có thể tiếp tục theo dõi vài chu kỳ reboot để đánh giá độ ổn định của phần cứng. Theo mã nguồn Studica, `params="zero_yaw"` sẽ đặt lại yaw; client đã kiểm chứng dùng `params="read"` để chỉ đọc pitch, yaw, roll.
 
-Đang chẩn đoán tình trạng màn hình ngoài không nhận HDMI trên Raspberry Pi 4 của VMX. Ngày 06/11, Ethernet có carrier, ping 3/3 và SSH thành công. Kernel đã nạp `vc4-kms-v3d`, GDM chạy và phiên X11 hoạt động, nhưng cả `card1-HDMI-A-1` lẫn `card1-HDMI-A-2` đều `disconnected`, `enabled=disabled`, EDID 0 byte và không có mode hiển thị. Chưa có kiểm chứng thực tế về màn hình, cáp và cổng đang cắm.
+Đang chẩn đoán tình trạng màn hình ngoài không hiện hình trên Raspberry Pi 4 của VMX. Ngày 06/11, Ethernet có carrier, ping 3/3 và SSH thành công. Kernel đã nạp `vc4-kms-v3d`, GDM chạy và phiên X11 hoạt động. Lúc đầu cả hai cổng HDMI đều `disconnected` và EDID 0 byte; sau đó `card1-HDMI-A-2` chuyển sang `connected`, EDID 256 byte, `enabled=enabled`. X11 nhận màn hình `LEN L1950wD`, đang xuất 1920×1080 @ 60 Hz và DPMS báo `Monitor is On`. Chưa có xác nhận trực tiếp màn hình ngoài đã hiện giao diện hay vẫn báo không có tín hiệu.
 
 ## Lỗi hoặc vấn đề chưa giải quyết
 
 - Lần reboot đầu ngày 04/11/2026 đã kẹt: VMX trả lời ping và mở TCP/53 nhưng SSH bị từ chối cho đến khi cấp nguồn lại. Nhật ký dừng ngay sau khi bắt đầu `snapd.apparmor.service`; đây là dấu hiệu nghi ngờ, **chưa chứng minh** Snap là nguyên nhân duy nhất. Drop-in 45 giây giới hạn thời gian kẹt tại bước này; một lần reboot phần mềm sau đó thành công, nhưng chưa đủ để khẳng định lỗi gián đoạn sẽ không lặp lại. Nếu lỗi tái diễn, cần console để xem trạng thái tại chỗ.
 - Nguồn NTP ASUS chỉ khả dụng khi máy và Ethernet được bật; cấu hình `ubuntu.local` của AGX/Orin còn đó nhưng chưa được kiểm chứng trong kết nối hiện tại.
-- HDMI chưa nhận màn hình. `sudo vcgencmd get_throttled` trả `0x50000`: đã từng sụt áp và giảm xung từ lần boot này, nhưng hiện không báo sụt áp. Nhật ký kernel có nhiều dòng `Voltage normalised`. Chưa xác định sụt áp có liên quan trực tiếp đến HDMI hay không; cũng cần kiểm tra cáp micro-HDMI, nguồn và đầu vào màn hình.
+- Nguồn Raspberry Pi đang sụt áp và giảm xung: `sudo vcgencmd get_throttled` chuyển từ `0x50000` sang `0x50005`, giữ `0x50005` ở ba lần đo cách nhau khoảng 5 giây. Nhật ký kernel có nhiều dòng `Voltage normalised`. Cần kiểm tra nguồn cấp cho VMX/Pi; chưa chứng minh sụt áp là nguyên nhân duy nhất của việc màn hình không hiện hình.
 
 ## Công việc tiếp theo
 
@@ -61,4 +61,4 @@ Không còn đầu việc bắt buộc của bảy giai đoạn. Có thể tiế
 2. Nếu VMX lại trả lời ping nhưng SSH từ chối, dùng màn hình/bàn phím để xem `systemctl status snapd.apparmor.service ssh --no-pager` và `journalctl -b -u snapd.apparmor.service -u ssh --no-pager` trước khi cấp nguồn lại.
 3. Kiểm tra sau reboot ASUS khi có thể: Chrony tự chạy và Ethernet vẫn có `172.22.11.1/24`.
 4. Với các thay đổi sau này trong `~/vmx_ws`, tạo commit và chạy `git push origin main` để đồng bộ repository GitHub.
-5. Với lỗi HDMI, xác nhận màn hình đã bật/chọn đúng input và cắm vào cổng micro-HDMI nào; thử cáp và cổng HDMI khác. Khi cắm, kiểm tra lại `/sys/class/drm/card1-HDMI-A-{1,2}/status` và kích thước `edid`. Kiểm tra nguồn VMX vì đã có sự kiện sụt áp. Chỉ cân nhắc ép mode KMS sau khi xác nhận đường vật lý.
+5. Với lỗi HDMI, xác nhận trực tiếp màn hình `LEN L1950wD` đã hiện hình chưa. Ưu tiên kiểm tra nguồn VMX/Pi vì `0x50005` báo sụt áp hiện tại; kiểm tra đầu cắm nguồn, bộ nguồn/ắc quy và dây cấp nguồn. Nếu màn hình vẫn không có hình dù X11 đã xuất 1080p, kiểm tra đúng input, cáp micro-HDMI và thử cổng HDMI0. Chỉ thay đổi mode hiển thị khi đã có kết quả kiểm tra vật lý.
