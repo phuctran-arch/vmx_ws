@@ -50,6 +50,15 @@ Không còn đầu việc bắt buộc của bảy giai đoạn. Có thể tiế
 
 Đang chẩn đoán tình trạng màn hình ngoài không hiện hình trên Raspberry Pi 4 của VMX. Ngày 06/11, Ethernet có carrier, ping 3/3 và SSH thành công. Kernel đã nạp `vc4-kms-v3d`, GDM chạy và phiên X11 hoạt động. Lúc đầu cả hai cổng HDMI đều `disconnected` và EDID 0 byte; sau đó `card1-HDMI-A-2` chuyển sang `connected`, EDID 256 byte, `enabled=enabled`. X11 nhận màn hình `LEN L1950wD`, đang xuất 1920×1080 @ 60 Hz và DPMS báo `Monitor is On`. Chưa có xác nhận trực tiếp màn hình ngoài đã hiện giao diện hay vẫn báo không có tín hiệu.
 
+## Điều khiển thủ công qua UDP (đầu việc phát sinh)
+
+- Đã kiểm tra VMX qua SSH ngày 06/11/2026: `vmx-udp-lowlevel.service` `active`, cổng UDP/15000 lắng nghe trên mọi giao diện, Titan CAN ID 42 khởi tạo thành công. `studica-ros2.service` `inactive` và cấu hình phương pháp 2 hiện chỉ bật pin/IMU.
+- Đã tạo `scripts/vmx_drive_udp.py` để gửi lệnh tiến, lùi, quay trái/phải có giới hạn thời gian và gói dừng; kiểm tra `py_compile`, giao diện CLI, độ dài gói 44 byte và checksum FNV-1a. Đã gửi **chỉ gói dừng** qua Wi-Fi; telemetry trên VMX trả `status_bits=0x37` (`cmd_seen=1`, `motor_enabled=0`, watchdog timeout sau khi dừng), `last_command_sequence=2632725010` khớp script, M0–M3 đều 0 RPM. Cập nhật `README.md` với lệnh chạy.
+- Đang thực hiện: xác nhận ánh xạ M0/M1 trái, M2/M3 phải và dấu động cơ trên xe hiện tại. Biên bản cũ của hệ UDP ghi tiến/lùi chạy được qua high-level, nhưng chưa thử script mới với bánh xe thật.
+- Chưa giải quyết: chuyển động, chiều quay và dừng thực tế của script mới chưa được kiểm chứng; host hiện không có gói `vmx_highlevel` để dùng `/cmd_vel` cho xe này.
+- Tiếp theo: kê xe để các bánh không chạm đất, chạy từng hướng thời gian ngắn, quan sát M0–M3 và xác nhận lệnh dừng; sau đó thử trên mặt đất ở tốc độ thấp khi nguồn đã ổn định.
+- Tiến độ riêng: kiểm tra giao thức và daemon 1/3, tạo và kiểm tra tĩnh script 2/3, thử phần cứng và hiệu chỉnh 0/3; tổng **2/3 mốc đã kiểm chứng**, chưa coi điều khiển xe hoàn tất.
+
 ## Lỗi hoặc vấn đề chưa giải quyết
 
 - Lần reboot đầu ngày 04/11/2026 đã kẹt: VMX trả lời ping và mở TCP/53 nhưng SSH bị từ chối cho đến khi cấp nguồn lại. Nhật ký dừng ngay sau khi bắt đầu `snapd.apparmor.service`; đây là dấu hiệu nghi ngờ, **chưa chứng minh** Snap là nguyên nhân duy nhất. Drop-in 45 giây giới hạn thời gian kẹt tại bước này; một lần reboot phần mềm sau đó thành công, nhưng chưa đủ để khẳng định lỗi gián đoạn sẽ không lặp lại. Nếu lỗi tái diễn, cần console để xem trạng thái tại chỗ.

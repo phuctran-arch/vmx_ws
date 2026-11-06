@@ -10,6 +10,23 @@ Workspace này ở `~/vmx_ws` trên máy tính. `vmx_cpp_monitor` nhận topic p
 - Thông điệp ROS 2 mẫu đã truyền từ VMX về máy tính. Phép thử phần cứng nhận `/battery_state` (12,07 V; khoảng 63% theo ước lượng NiMH của Studica) và `/imu` (`imu_link`) trên board; node C++ trên máy tính cũng nhận cả hai.
 - Client C++ chạy trên VMX đã đọc dịch vụ `/imu/get_imu_data`. Chrony trên ASUS cấp giờ qua Ethernet `172.22.11.1`. `studica-ros2.service` đã chạy hơn 1 phút, host C++ nhận pin/IMU, board C++ đọc góc IMU; sau lệnh stop, dịch vụ UDP `active`, driver ROS 2 đã dừng. Sau một lần reboot phần mềm thành công ngày 04/11/2026, SSH hoạt động, UDP tự chạy, ROS 2 vẫn tắt mặc định và VMX đồng bộ NTP với offset `-524 µs`. Xem [tiến độ kiểm chứng](PROGRESS.md).
 
+## Điều khiển xe bằng UDP đang chạy trên VMX
+
+Ngày 06/11/2026, `vmx-udp-lowlevel.service` đang `active`, nhận gói UDP ở `0.0.0.0:15000`, nhận diện Titan Quad CAN ID 42. Workspace này chưa cài `vmx_highlevel` trên laptop; cấu hình ROS 2 Studica chỉ bật pin và IMU, vì vậy gửi `/cmd_vel` trong workspace này sẽ không làm xe chạy. Script [vmx_drive_udp.py](scripts/vmx_drive_udp.py) gửi trực tiếp lệnh ngắn tới daemon hiện có, rồi gửi lệnh dừng trong 1,2 giây. Daemon có watchdog 0,30 giây.
+
+**Kê cả bốn bánh khỏi mặt đất ở lần chạy đầu.** Biên bản cũ ghi M0/M1 ở bên trái, M2/M3 ở bên phải và dấu lệnh ngược nhau; chưa xác nhận trực tiếp ánh xạ này trên xe hiện tại. Kiểm tra nguồn cấp trước khi thử vì Raspberry Pi từng báo sụt áp `0x50005`. Trên laptop nối cùng Wi-Fi `TTN_5G`:
+
+```bash
+cd ~/vmx_ws
+python3 scripts/vmx_drive_udp.py forward   # tiến 0,7 giây
+python3 scripts/vmx_drive_udp.py backward  # lùi 0,7 giây
+python3 scripts/vmx_drive_udp.py left      # quay trái tại chỗ 0,7 giây
+python3 scripts/vmx_drive_udp.py right     # quay phải tại chỗ 0,7 giây
+python3 scripts/vmx_drive_udp.py stop      # dừng ngay
+```
+
+Mặc định VMX ở `192.168.50.220`, duty mỗi bánh `0.16`; nếu IP Wi-Fi đổi, thêm `--host IP_MOI`. Có thể đổi `--speed` trong `(0, 0.25]` và `--duration` trong `(0, 3.0]`. Đây là duty thô, không phải m/s. Lệnh `left`/`right` quay tại chỗ. Script đã kiểm tra cú pháp và cấu trúc gói 44 byte/FNV-1a; gói **dừng** qua Wi-Fi đã được VMX nhận và telemetry báo `motor_enabled=0`, cả bốn RPM bằng 0. **Chưa chạy lệnh có duty khác 0 trên xe trong phiên này**, nên chiều di chuyển thực tế vẫn phải xác nhận khi bánh được kê lên.
+
 ## Chạy lại phép thử cảm biến
 
 Máy tính dùng Ethernet `enp46s0` với địa chỉ `172.22.11.1/24` đã lưu trong profile NetworkManager `vmx-lowlevel-lan`; VMX là `172.22.11.2`. Nếu mất kết nối sau khi đổi mạng, kiểm tra `nmcli device show enp46s0` và `ping 172.22.11.2`.
