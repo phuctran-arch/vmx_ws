@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Bounded manual drive commands for the VMX direct UDP low-level daemon.
 
-Motor signs follow the previous four-wheel differential-drive bench log:
-M0/M1 are the left side, M2/M3 the right side, with opposing raw signs.
+Motor signs are inferred from the previous four-wheel differential-drive bench log:
+M0/M1 are assumed left, M2/M3 right, with opposing raw signs.
 Verify wheel positions and directions with the wheels lifted before driving.
 """
 

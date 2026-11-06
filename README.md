@@ -14,7 +14,7 @@ Workspace này ở `~/vmx_ws` trên máy tính. `vmx_cpp_monitor` nhận topic p
 
 Ngày 06/11/2026, `vmx-udp-lowlevel.service` đang `active`, nhận gói UDP ở `0.0.0.0:15000`, nhận diện Titan Quad CAN ID 42. Workspace này chưa cài `vmx_highlevel` trên laptop; cấu hình ROS 2 Studica chỉ bật pin và IMU, vì vậy gửi `/cmd_vel` trong workspace này sẽ không làm xe chạy. Script [vmx_drive_udp.py](scripts/vmx_drive_udp.py) gửi trực tiếp lệnh ngắn tới daemon hiện có, rồi gửi lệnh dừng trong 1,2 giây. Daemon có watchdog 0,30 giây.
 
-**Kê cả bốn bánh khỏi mặt đất ở lần chạy đầu.** Biên bản cũ ghi M0/M1 ở bên trái, M2/M3 ở bên phải và dấu lệnh ngược nhau; chưa xác nhận trực tiếp ánh xạ này trên xe hiện tại. Kiểm tra nguồn cấp trước khi thử vì Raspberry Pi từng báo sụt áp `0x50005`. Trên laptop nối cùng Wi-Fi `TTN_5G`:
+**Kê cả bốn bánh khỏi mặt đất ở lần chạy đầu.** Từ kết quả encoder tiến/lùi trong biên bản cũ, script **suy luận** M0/M1 ở bên trái, M2/M3 ở bên phải và dấu lệnh ngược nhau; chưa xác nhận trực tiếp ánh xạ này trên xe hiện tại. Kiểm tra nguồn cấp trước khi thử vì Raspberry Pi từng báo sụt áp `0x50005`. Trên laptop nối cùng Wi-Fi `TTN_5G`:
 
 ```bash
 cd ~/vmx_ws
