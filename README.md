@@ -14,6 +14,14 @@ Workspace này ở `~/vmx_ws` trên máy tính. `vmx_cpp_monitor` nhận topic p
 
 Máy tính dùng Ethernet `enp46s0` với địa chỉ `172.22.11.1/24` đã lưu trong profile NetworkManager `vmx-lowlevel-lan`; VMX là `172.22.11.2`. Nếu mất kết nối sau khi đổi mạng, kiểm tra `nmcli device show enp46s0` và `ping 172.22.11.2`.
 
+Ngày 06/11/2026, laptop và VMX cùng kết nối Wi‑Fi `TTN_5G`; VMX có IP DHCP `192.168.50.220` và tên `vmx.local`. SSH qua Wi‑Fi đã được kiểm chứng bằng lệnh sau trên laptop (dùng host key đã biết từ kết nối Ethernet):
+
+```bash
+ssh -o HostKeyAlias=172.22.11.2 vmx@vmx.local
+```
+
+IP Wi‑Fi có thể đổi theo DHCP; kiểm tra lại bằng `getent hosts vmx.local`. Cấu hình CycloneDDS trong workspace vẫn trỏ tới Ethernet, nên phép thử này chỉ xác nhận SSH qua Wi‑Fi, chưa xác nhận ROS 2 qua Wi‑Fi.
+
 Terminal 1 trên máy tính:
 
 ```bash

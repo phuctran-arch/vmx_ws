@@ -30,10 +30,11 @@ Cập nhật: 06/11/2026. Workspace máy tính: `~/vmx_ws`; workspace VMX: `~/st
 - Sau lần reboot đầu bị kẹt trước khi SSH chạy, người dùng cấp nguồn lại và SSH hoạt động. Nhật ký của boot lỗi kết thúc khi `snapd.apparmor.service` vừa bắt đầu; dịch vụ này nằm trước `sysinit.target` và trước SSH trong chuỗi khởi động. Đã cài drop-in giới hạn `TimeoutStartSec=45s`, kiểm tra `systemctl restart snapd.apparmor.service` trả `Result=success`.
 - Một lần reboot phần mềm tiếp theo đưa SSH trở lại sau khoảng 25 giây. Ban đầu NTP chưa đồng bộ; khoảng một phút sau, timesyncd nhận `172.22.11.1`. `scripts/verify_board_after_reboot.sh` chạy lại thành công: UDP `active/enabled`, ROS 2 `inactive/disabled`, NTP `yes`, offset `-524 µs`, root distance `31,134 ms`.
 - Đã khởi tạo Git cho workspace và đẩy 31 file nguồn/tài liệu lên repository riêng tư `phuctran-arch/vmx_ws`, nhánh `main`. Đã đối chiếu SHA commit đầu tiên `7b07692` giữa máy và GitHub. Các thư mục build, log và thư viện nhị phân `vendor/opt/` không nằm trong commit.
+- Ngày 06/11/2026 đã kiểm chứng SSH qua Wi‑Fi `TTN_5G`: laptop `192.168.50.77`, VMX `192.168.50.220` qua `wlan0`, `vmx.local` phân giải đúng IP. Route đi qua `wlp45s0`, ping 3/3, TCP/22 mở, SSH đăng nhập thành công và host key khớp bản đã biết từ Ethernet. Chưa kiểm chứng ROS 2 qua Wi‑Fi.
 
 ## File đã tạo hoặc chỉnh sửa
 
-- `README.md`, `env.sh`, `config/params_method2.yaml`, `config/cyclonedds_host.xml`, `config/cyclonedds_board.xml`.
+- `README.md` (bổ sung lệnh SSH qua Wi‑Fi), `env.sh`, `config/params_method2.yaml`, `config/cyclonedds_host.xml`, `config/cyclonedds_board.xml`.
 - `src/vmx_cpp_monitor/`, `src/vmx_comm/`, `scripts/check_board.sh`, `scripts/run_board_sensor_test.sh`.
 - `board_src/vmx_cpp_imu_client/CMakeLists.txt`, `package.xml`, `src/read_imu.cpp`; script thử cảm biến đã bổ sung bước gọi client C++.
 - `scripts/setup_host_ntp.sh`, `scripts/run_studica_ros2_mode.sh`, `scripts/verify_board_after_reboot.sh` (chờ NTP tối đa hai phút), `config/zz-vmx-local-timesyncd.conf`, `config/studica-ros2.service`, `config/snapd-apparmor-timeout.conf`.
